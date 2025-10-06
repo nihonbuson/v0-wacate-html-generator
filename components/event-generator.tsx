@@ -30,6 +30,7 @@ interface Session {
 interface EventData {
   eventName: string
   organizer: string
+  asterSponsorship: "あり" | "なし"
   startDate: string
   startTime: string
   receptionStartTime: string
@@ -57,12 +58,13 @@ export default function EventGenerator() {
   const [eventData, setEventData] = useState<EventData>({
     eventName: "WACATE 2025 夏",
     organizer: "WACATE実行委員会",
+    asterSponsorship: "なし",
     startDate: "2025年6月28日（土）",
     startTime: "10:00",
     receptionStartTime: "09:30",
     endDate: "2025年6月29日（日）",
     endTime: "17:30",
-    capacity: "48名（定員となり次第、受付終了となります）",
+    capacity: "48名",
     minCapacity: "24名",
     feeUnder35: "￥27,000",
     feeOver35: "￥30,000",
@@ -301,7 +303,16 @@ export default function EventGenerator() {
         ? `<div align="center"><span style="font-size: 36pt;">参加申し込みを締め切りました。</span></div>`
         : eventData.registrationStatus === "open"
           ? `<div align="center"><a href="${eventData.registrationUrl}"><span style="font-size: 36pt;"><span style="text-decoration: underline;">参加申し込み(${eventData.registrationDeadline})</span></span></a></div>`
-          : `<div align="center"><span style="font-size: 36pt;"><span style="text-decoration: underline;">近日参加申し込み開始予定！</span></span></div>`
+          : `<div align="center"><span style="font-size: 36pt;"><span style="text-decoration: underline;">近日参加申し込み開始予定!</span></span></div>`
+
+    const asterSponsorshipHTML =
+      eventData.asterSponsorship === "あり"
+        ? `<div class="col-sm-2"> </div>
+<div class="col-sm-2"><strong>協賛</strong></div>
+<div class="col-sm-8"><a href="http://aster.or.jp/" target="_blank">ソフトウェアテスト技術振興協会（ASTER）</a></div>
+<hr width="100%" />
+`
+        : ""
 
     const sessionIds = generateSessionIds()
     let sessionIndex = 0
@@ -348,9 +359,9 @@ export default function EventGenerator() {
 <div class="col-sm-2"><strong>日時</strong></div>
 <div class="col-sm-8">${dateTimeString}</div>
 <hr width="100%" />
-<div class="col-sm-2"> </div>
+${asterSponsorshipHTML}<div class="col-sm-2"> </div>
 <div class="col-sm-2"><strong>定員</strong></div>
-<div class="col-sm-8">${eventData.capacity}<br />※最小催行人数：${eventData.minCapacity}</div>
+<div class="col-sm-8">${eventData.capacity}（定員となり次第、受付終了となります）<br />※最小催行人数：${eventData.minCapacity}</div>
 <hr width="100%" />
 <div class="col-sm-2"> </div>
 <div class="col-sm-2"><strong>参加費</strong></div>
@@ -653,6 +664,34 @@ ${day2HTML}`
                 </div>
               </div>
 
+              <div className="space-y-2">
+                <Label>ASTER協賛</Label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="asterSponsorship"
+                      value="あり"
+                      checked={eventData.asterSponsorship === "あり"}
+                      onChange={(e) => updateField("asterSponsorship", e.target.value as "あり" | "なし")}
+                      className="accent-accent"
+                    />
+                    <span>あり</span>
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="asterSponsorship"
+                      value="なし"
+                      checked={eventData.asterSponsorship === "なし"}
+                      onChange={(e) => updateField("asterSponsorship", e.target.value as "あり" | "なし")}
+                      className="accent-accent"
+                    />
+                    <span>なし</span>
+                  </label>
+                </div>
+              </div>
+
               <div className="space-y-4 p-4 border border-border rounded-lg">
                 <h3 className="font-semibold">日時</h3>
                 <div className="grid gap-4 md:grid-cols-2">
@@ -699,12 +738,16 @@ ${day2HTML}`
 
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="capacity">定員</Label>
+                  <Label htmlFor="capacity">定員（人数のみ）</Label>
                   <Input
                     id="capacity"
                     value={eventData.capacity}
                     onChange={(e) => updateField("capacity", e.target.value)}
+                    placeholder="48名"
                   />
+                  <p className="text-sm text-muted-foreground">
+                    ※「（定員となり次第、受付終了となります）」は自動的に付与されます
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="minCapacity">最小催行人数</Label>
