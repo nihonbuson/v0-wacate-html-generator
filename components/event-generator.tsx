@@ -315,12 +315,16 @@ export default function EventGenerator() {
         : ""
 
     const sessionIds = generateSessionIds()
-    let sessionIndex = 0
+    let allSessionIndex = 0
 
     const day1SessionsHTML = eventData.day1Sessions
-      .filter((session) => session.type === "session")
       .map((session) => {
-        const idInfo = sessionIds[sessionIndex++]
+        const idInfo = sessionIds[allSessionIndex++]
+
+        if (session.type !== "session") {
+          return ""
+        }
+
         const anchorLink = idInfo.generatedId ? `#${idInfo.generatedId}` : ""
 
         return `
@@ -330,12 +334,17 @@ export default function EventGenerator() {
                 <td style="width: 25%;">${session.speaker}<br /><span style="font-size: small;">${session.speakerAffiliation}</span></td>
             </tr>`
       })
+      .filter((html) => html !== "")
       .join("")
 
     const day2SessionsHTML = eventData.day2Sessions
-      .filter((session) => session.type === "session")
       .map((session) => {
-        const idInfo = sessionIds[sessionIndex++]
+        const idInfo = sessionIds[allSessionIndex++]
+
+        if (session.type !== "session") {
+          return ""
+        }
+
         const anchorLink = idInfo.generatedId ? `#${idInfo.generatedId}` : ""
 
         return `
@@ -345,6 +354,7 @@ export default function EventGenerator() {
                 <td style="width: 25%;">${session.speaker}<br /><span style="font-size: small;">${session.speakerAffiliation}</span></td>
             </tr>`
       })
+      .filter((html) => html !== "")
       .join("")
 
     const committeeMembersHTML = eventData.committeeMembers
