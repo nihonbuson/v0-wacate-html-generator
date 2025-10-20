@@ -300,17 +300,18 @@ export default function EventGenerator() {
 
     const registrationSection =
       eventData.registrationStatus === "closed"
-        ? `<div align="center"><span style="font-size: 36pt;">参加申し込みを締め切りました。</span></div>`
+        ? `<span style="font-size: 36pt;">参加申し込みを締め切りました。</span>`
         : eventData.registrationStatus === "open"
-          ? `<div align="center"><a href="${eventData.registrationUrl}"><span style="font-size: 36pt;"><span style="text-decoration: underline;">参加申し込み(${eventData.registrationDeadline})</span></span></a></div>`
-          : `<div align="center"><span style="font-size: 36pt;"><span style="text-decoration: underline;">近日参加申し込み開始予定!</span></span></div>`
+          ? `<a href="${eventData.registrationUrl}"><span style="font-size: 36pt;"><span style="text-decoration: underline;">申し込み受付中（${eventData.registrationDeadline}）</span></span></a>`
+          : `<span style="font-size: 36pt;"><span style="text-decoration: underline;">近日参加申し込み開始予定!</span></span>`
 
     const asterSponsorshipHTML =
       eventData.asterSponsorship === "あり"
-        ? `<div class="col-sm-2"> </div>
-<div class="col-sm-2"><strong>協賛</strong></div>
-<div class="col-sm-8"><a href="http://aster.or.jp/" target="_blank">ソフトウェアテスト技術振興協会（ASTER）</a></div>
-<hr width="100%" />
+        ? `    <div class="row">
+        <div class="col-sm-2"><strong>協賛</strong></div>
+        <div class="col-sm-9"><a href="http://aster.or.jp/" target="_blank">ソフトウェアテスト技術振興協会（ASTER）</a></div>
+    </div>
+    <hr class="ml-2 col-sm-11"/>
 `
         : ""
 
@@ -361,55 +362,62 @@ export default function EventGenerator() {
       .map((member) => `${member}（WACATE実行委員会）<br />`)
       .join("")
 
-    return `<div class="col-sm-2"> </div>
-<div class="col-sm-2"><strong>主催</strong></div>
-<div class="col-sm-8">${eventData.organizer}</div>
-<hr width="100%" />
-<div class="col-sm-2"> </div>
-<div class="col-sm-2"><strong>日時</strong></div>
-<div class="col-sm-8">${dateTimeString}</div>
-<hr width="100%" />
-${asterSponsorshipHTML}<div class="col-sm-2"> </div>
-<div class="col-sm-2"><strong>定員</strong></div>
-<div class="col-sm-8">${eventData.capacity}（定員となり次第、受付終了となります）<br />※最小催行人数：${eventData.minCapacity}</div>
-<hr width="100%" />
-<div class="col-sm-2"> </div>
-<div class="col-sm-2"><strong>参加費</strong></div>
-<div class="col-sm-8">35歳以下　:${eventData.feeUnder35}<br />36歳以上　:${eventData.feeOver35}<br />※会場費、印刷費、宿泊費、食費、その他運営にかかる事務費含む（キャンセル不可）<br />※参加費は当日受付時に会場でお支払いいただきます。（現金のみ）</div>
-<hr width="100%" />
-<div class="col-sm-2"> </div>
-<div class="col-sm-2"><strong>会場</strong></div>
-<div class="col-sm-8">${eventData.venue}<br />${eventData.venueAccess}<br /><a href="${eventData.venueUrl}" target="_blank" rel="noopener">${eventData.venueUrl}</a></div>
-<hr width="100%" />
-<div class="col-sm-2"> </div>
-<div class="col-sm-8">${eventData.description}</div>
-<hr width="100%" />
-<div class="col-sm-2"> </div>
-<div class="col-sm-8">
-    <hr width="100%" />
-    ${registrationSection}
-</div>
-<hr width="100%" />
-<div class="col-sm-2"> </div>
-<div class="col-sm-8">
-    <p><strong>プログラム</strong>　　※ <a href="${eventData.programDetailUrl}">セッション詳細・全スケジュールはこちらからご確認ください</a></p>
-    <p>1日目</p>
-    <table style="border-collapse: collapse; width: 100%;" border="1">
-        <tbody>${day1SessionsHTML}
-        </tbody>
-    </table>
-    <p>２日目</p>
-    <table style="border-collapse: collapse; width: 100%;" border="1">
-        <tbody>${day2SessionsHTML}
-        </tbody>
-    </table>
-</div>
-<hr width="100%" />
-${registrationSection}
-<hr width="100%" />
-<div class="col-sm-2"> </div>
-<div class="col-sm-8">
-    <div align="center">
+    return `<div class="container ml-2">
+    <div class="row">
+        <div class="col-sm-2"><strong>主催</strong></div>
+        <div class="col-sm-9">${eventData.organizer}</div>
+    </div>
+    <hr class="ml-2 col-sm-11"/>
+    <div class="row">
+        <div class="col-sm-2"><strong>日時</strong></div>
+        <div class="col-sm-9">${dateTimeString}</div>
+    </div>
+    <hr class="ml-2 col-sm-11"/>
+${asterSponsorshipHTML}    <div class="row">
+        <div class="col-sm-2"><strong>定員</strong></div>
+        <div class="col-sm-9">${eventData.capacity}（定員となり次第、受付終了となります）<br />※最小催行人数：${eventData.minCapacity}</div>
+    </div>
+    <hr class="ml-2 col-sm-11"/>
+    <div class="row">
+        <div class="col-sm-2"><strong>参加費</strong></div>
+        <div class="col-sm-9">
+            35歳以下　:${eventData.feeUnder35}<br />36歳以上　:${eventData.feeOver35}<br />※会場費、印刷費、宿泊費、食費、その他運営にかかる事務費含む（キャンセル不可）<br />※参加費は当日受付時に会場でお支払いいただきます。（現金のみ）
+        </div>
+    </div>
+    <hr class="ml-2 col-sm-11"/>
+    <div class="row">
+        <div class="col-sm-2"><strong>会場</strong></div>
+        <div class="col-sm-9">${eventData.venue}<br />${eventData.venueAccess}<br /><a href="${eventData.venueUrl}" target="_blank" rel="noopener">${eventData.venueUrl}</a>
+        </div>
+    </div>
+    <hr class="ml-2 col-sm-11"/>
+    <div class="row">
+        <div class="ml-8 col-sm-11">${eventData.description}</div>
+    </div>
+    <hr class="ml-2 col-sm-11"/>
+    <div class="ml-2 col-sm-11 text-center">
+        ${registrationSection}
+    </div>
+    <hr class="ml-2 col-sm-11"/>
+    <div class="col-sm-10">
+        <p><strong>プログラム</strong>　　※ <a href="${eventData.programDetailUrl}">セッション詳細・全スケジュールはこちらからご確認ください</a></p>
+        <p>1日目</p>
+        <table style="border-collapse: collapse; width: 100%;" border="1">
+            <tbody>${day1SessionsHTML}
+            </tbody>
+        </table>
+        <p>２日目</p>
+        <table style="border-collapse: collapse; width: 100%;" border="1">
+            <tbody>${day2SessionsHTML}
+            </tbody>
+        </table>
+    </div>
+    <hr class="ml-2 col-sm-11"/>
+    <div class="ml-2 col-sm-11 text-center">
+        ${registrationSection}
+    </div>
+    <hr class="ml-2 col-sm-11"/>
+    <div class="ml-2 col-sm-11 text-center">
         <p style="text-align: center;"><strong>実行委員長</strong><br />${eventData.committeeChair}（WACATE実行委員会）</p>
         <p style="text-align: center;"><strong>実行委員</strong><br />${committeeMembersHTML}</p>
     </div>
