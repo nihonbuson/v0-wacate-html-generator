@@ -142,11 +142,16 @@ export default function EventGenerator() {
     setEventData((prev) => ({ ...prev, [field]: value }))
   }
 
-  const addSession = (day: "day1Sessions" | "day2Sessions") => {
+  const addSession = (day: "day1Sessions" | "day2Sessions", afterIndex?: number) => {
+    const sessions = eventData[day]
+    const insertIndex = afterIndex !== undefined ? afterIndex : sessions.length - 1
+    const previousSession = sessions[insertIndex]
+    const previousEndTime = previousSession?.endTime || ""
+
     const newSession: Session = {
       id: "session",
-      startTime: "",
-      endTime: "",
+      startTime: previousEndTime,
+      endTime: previousEndTime,
       duration: "",
       title: "",
       titleLink: "#session",
@@ -156,10 +161,14 @@ export default function EventGenerator() {
       references: [],
       type: "session",
     }
-    setEventData((prev) => ({
-      ...prev,
-      [day]: [...prev[day], newSession],
-    }))
+    setEventData((prev) => {
+      const newSessions = [...prev[day]]
+      newSessions.splice(insertIndex + 1, 0, newSession)
+      return {
+        ...prev,
+        [day]: newSessions,
+      }
+    })
   }
 
   const updateSession = (day: "day1Sessions" | "day2Sessions", index: number, field: keyof Session, value: any) => {
@@ -180,6 +189,15 @@ export default function EventGenerator() {
 
         return updatedSession
       })
+
+      // Auto-fill next session's start time when end time changes
+      if (field === "endTime" && value && index < updatedSessions.length - 1) {
+        updatedSessions[index + 1] = {
+          ...updatedSessions[index + 1],
+          startTime: value,
+          duration: calculateDuration(value, updatedSessions[index + 1].endTime),
+        }
+      }
 
       return { ...prev, [day]: updatedSessions }
     })
@@ -1021,9 +1039,10 @@ ${day2HTML}`
                         </Select>
                       </div>
                       <TimeInput
-                        label="開始時刻"
+                        label={index === 0 ? "開始時刻" : "開始時刻（自動入力）"}
                         value={session.startTime}
                         onChange={(value) => updateSession("day1Sessions", index, "startTime", value)}
+                        readOnly={index !== 0}
                       />
                       <TimeInput
                         label="終了時刻"
@@ -1034,9 +1053,10 @@ ${day2HTML}`
                   ) : (
                     <div className="grid gap-3 md:grid-cols-2">
                       <TimeInput
-                        label="開始時刻"
+                        label={index === 0 ? "開始時刻" : "開始時刻（自動入力）"}
                         value={session.startTime}
                         onChange={(value) => updateSession("day1Sessions", index, "startTime", value)}
+                        readOnly={index !== 0}
                       />
                       <TimeInput
                         label="終了時刻"
@@ -1158,6 +1178,16 @@ ${day2HTML}`
                       />
                     </div>
                   )}
+
+                  <Button
+                    onClick={() => addSession("day1Sessions", index)}
+                    variant="ghost"
+                    size="sm"
+                    className="w-full mt-2 text-muted-foreground hover:text-foreground"
+                  >
+                    <Plus className="h-3 w-3 mr-1" />
+                    ここにセッションを挿入
+                  </Button>
                 </div>
               ))}
               <Button onClick={() => addSession("day1Sessions")} variant="outline" className="w-full">
@@ -1247,9 +1277,10 @@ ${day2HTML}`
                         </Select>
                       </div>
                       <TimeInput
-                        label="開始時刻"
+                        label={index === 0 ? "開始時刻" : "開始時刻（自動入力）"}
                         value={session.startTime}
                         onChange={(value) => updateSession("day2Sessions", index, "startTime", value)}
+                        readOnly={index !== 0}
                       />
                       <TimeInput
                         label="終了時刻"
@@ -1260,9 +1291,10 @@ ${day2HTML}`
                   ) : (
                     <div className="grid gap-3 md:grid-cols-2">
                       <TimeInput
-                        label="開始時刻"
+                        label={index === 0 ? "開始時刻" : "開始時刻（自動入力）"}
                         value={session.startTime}
                         onChange={(value) => updateSession("day2Sessions", index, "startTime", value)}
+                        readOnly={index !== 0}
                       />
                       <TimeInput
                         label="終了時刻"
@@ -1384,6 +1416,16 @@ ${day2HTML}`
                       />
                     </div>
                   )}
+
+                  <Button
+                    onClick={() => addSession("day2Sessions", index)}
+                    variant="ghost"
+                    size="sm"
+                    className="w-full mt-2 text-muted-foreground hover:text-foreground"
+                  >
+                    <Plus className="h-3 w-3 mr-1" />
+                    ここにセッションを挿入
+                  </Button>
                 </div>
               ))}
               <Button onClick={() => addSession("day2Sessions")} variant="outline" className="w-full">
