@@ -143,10 +143,14 @@ export default function EventGenerator() {
   }
 
   const addSession = (day: "day1Sessions" | "day2Sessions") => {
+    const sessions = eventData[day]
+    const lastSession = sessions.length > 0 ? sessions[sessions.length - 1] : null
+    const previousEndTime = lastSession?.endTime || ""
+
     const newSession: Session = {
       id: "session",
-      startTime: "",
-      endTime: "",
+      startTime: previousEndTime,
+      endTime: previousEndTime,
       duration: "",
       title: "",
       titleLink: "#session",
