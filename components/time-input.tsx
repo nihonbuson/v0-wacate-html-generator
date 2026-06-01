@@ -8,12 +8,14 @@ interface TimeInputProps {
   onChange: (value: string) => void
   label?: string
   id?: string
+  readOnly?: boolean
 }
 
-export function TimeInput({ value, onChange, label, id }: TimeInputProps) {
+export function TimeInput({ value, onChange, label, id, readOnly = false }: TimeInputProps) {
   const [hour, minute] = value.split(":").map((v) => v || "")
 
   const handleHourChange = (newHour: string) => {
+    if (readOnly) return
     const hourNum = Number.parseInt(newHour) || 0
     const clampedHour = Math.max(0, Math.min(23, hourNum))
     const formattedHour = String(clampedHour).padStart(2, "0")
@@ -21,6 +23,7 @@ export function TimeInput({ value, onChange, label, id }: TimeInputProps) {
   }
 
   const handleMinuteChange = (newMinute: string) => {
+    if (readOnly) return
     const minuteNum = Number.parseInt(newMinute) || 0
     const clampedMinute = Math.max(0, Math.min(59, minuteNum))
     const formattedMinute = String(clampedMinute).padStart(2, "0")
@@ -38,8 +41,9 @@ export function TimeInput({ value, onChange, label, id }: TimeInputProps) {
           max="23"
           value={hour}
           onChange={(e) => handleHourChange(e.target.value)}
-          className="w-20 text-center"
+          className={`w-20 text-center ${readOnly ? "bg-muted" : ""}`}
           placeholder="00"
+          readOnly={readOnly}
         />
         <span className="text-muted-foreground">:</span>
         <Input
@@ -48,8 +52,9 @@ export function TimeInput({ value, onChange, label, id }: TimeInputProps) {
           max="59"
           value={minute}
           onChange={(e) => handleMinuteChange(e.target.value)}
-          className="w-20 text-center"
+          className={`w-20 text-center ${readOnly ? "bg-muted" : ""}`}
           placeholder="00"
+          readOnly={readOnly}
         />
       </div>
     </div>

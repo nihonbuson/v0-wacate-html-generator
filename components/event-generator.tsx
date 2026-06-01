@@ -181,6 +181,15 @@ export default function EventGenerator() {
         return updatedSession
       })
 
+      // Auto-fill next session's start time when end time changes
+      if (field === "endTime" && value && index < updatedSessions.length - 1) {
+        updatedSessions[index + 1] = {
+          ...updatedSessions[index + 1],
+          startTime: value,
+          duration: calculateDuration(value, updatedSessions[index + 1].endTime),
+        }
+      }
+
       return { ...prev, [day]: updatedSessions }
     })
   }
@@ -1021,9 +1030,10 @@ ${day2HTML}`
                         </Select>
                       </div>
                       <TimeInput
-                        label="開始時刻"
+                        label={index === 0 ? "開始時刻" : "開始時刻（自動入力）"}
                         value={session.startTime}
                         onChange={(value) => updateSession("day1Sessions", index, "startTime", value)}
+                        readOnly={index !== 0}
                       />
                       <TimeInput
                         label="終了時刻"
@@ -1034,9 +1044,10 @@ ${day2HTML}`
                   ) : (
                     <div className="grid gap-3 md:grid-cols-2">
                       <TimeInput
-                        label="開始時刻"
+                        label={index === 0 ? "開始時刻" : "開始時刻（自動入力）"}
                         value={session.startTime}
                         onChange={(value) => updateSession("day1Sessions", index, "startTime", value)}
+                        readOnly={index !== 0}
                       />
                       <TimeInput
                         label="終了時刻"
@@ -1247,9 +1258,10 @@ ${day2HTML}`
                         </Select>
                       </div>
                       <TimeInput
-                        label="開始時刻"
+                        label={index === 0 ? "開始時刻" : "開始時刻（自動入力）"}
                         value={session.startTime}
                         onChange={(value) => updateSession("day2Sessions", index, "startTime", value)}
+                        readOnly={index !== 0}
                       />
                       <TimeInput
                         label="終了時刻"
@@ -1260,9 +1272,10 @@ ${day2HTML}`
                   ) : (
                     <div className="grid gap-3 md:grid-cols-2">
                       <TimeInput
-                        label="開始時刻"
+                        label={index === 0 ? "開始時刻" : "開始時刻（自動入力）"}
                         value={session.startTime}
                         onChange={(value) => updateSession("day2Sessions", index, "startTime", value)}
+                        readOnly={index !== 0}
                       />
                       <TimeInput
                         label="終了時刻"
