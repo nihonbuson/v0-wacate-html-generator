@@ -265,7 +265,12 @@ export default function EventGenerator() {
           [index]: true,
         },
       }))
-      updateSession(day, index, "speaker", "")
+      // Don't clear the speaker field if it already has a custom value
+      const currentSpeaker = eventData[day][index]?.speaker
+      const committeeOptions = getCommitteeOptions()
+      if (committeeOptions.includes(currentSpeaker)) {
+        updateSession(day, index, "speaker", "")
+      }
     } else {
       setCustomSpeakers((prev) => ({
         ...prev,
@@ -606,6 +611,37 @@ ${day2HTML}`
         // Validate that the JSON has the expected structure
         if (json && typeof json === "object" && "eventName" in json) {
           setEventData(json)
+          
+          // Update customSpeakers state based on imported data
+          const committeeOptions = [
+            json.committeeChair,
+            ...(json.committeeMembers || []).filter((m: string) => m.trim() !== "")
+          ]
+          
+          const newCustomSpeakers = {
+            day1: {} as { [key: number]: boolean },
+            day2: {} as { [key: number]: boolean }
+          }
+          
+          // Check day1Sessions for custom speakers
+          if (json.day1Sessions) {
+            json.day1Sessions.forEach((session: Session, index: number) => {
+              if (session.speaker && !committeeOptions.includes(session.speaker)) {
+                newCustomSpeakers.day1[index] = true
+              }
+            })
+          }
+          
+          // Check day2Sessions for custom speakers
+          if (json.day2Sessions) {
+            json.day2Sessions.forEach((session: Session, index: number) => {
+              if (session.speaker && !committeeOptions.includes(session.speaker)) {
+                newCustomSpeakers.day2[index] = true
+              }
+            })
+          }
+          
+          setCustomSpeakers(newCustomSpeakers)
         } else {
           alert("無効なJSONファイルです。正しいフォーマットのファイルを選択してください。")
         }
@@ -1054,7 +1090,7 @@ ${day2HTML}`
                               <SelectItem value="その他">その他</SelectItem>
                             </SelectContent>
                           </Select>
-                          {customSpeakers.day1[index] && (
+                          {(customSpeakers.day1[index] || !getCommitteeOptions().includes(session.speaker)) && (
                             <Input
                               value={session.speaker}
                               onChange={(e) => updateSession("day1Sessions", index, "speaker", e.target.value)}
@@ -1280,7 +1316,7 @@ ${day2HTML}`
                               <SelectItem value="その他">その他</SelectItem>
                             </SelectContent>
                           </Select>
-                          {customSpeakers.day2[index] && (
+                          {(customSpeakers.day2[index] || !getCommitteeOptions().includes(session.speaker)) && (
                             <Input
                               value={session.speaker}
                               onChange={(e) => updateSession("day2Sessions", index, "speaker", e.target.value)}
